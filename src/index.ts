@@ -1,16 +1,11 @@
 import {plugin, muxrpc} from 'secret-stack-decorators';
+import {Discovery} from './types';
 const broadcast = require('broadcast-stream');
 const Ref = require('ssb-ref');
 const Keys = require('ssb-keys');
 const Notify = require('pull-notify');
 const debug = require('debug')('ssb:lan');
 const lanDiscoveryPort = require('../port');
-
-type Discovery = {
-  verified: boolean;
-  address: string;
-  capsHash: string | null;
-};
 
 @plugin('1.0.0')
 class LAN {
