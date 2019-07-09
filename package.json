@@ -1,0 +1,37 @@
+{
+  "name": "ssb-lan",
+  "description": "SSB plugin for discovery of other peers in the same LAN",
+  "version": "0.0.1",
+  "homepage": "https://github.com/staltz/ssb-lan",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/staltz/ssb-lan.git"
+  },
+  "dependencies": {
+    "broadcast-stream": "^0.2.2",
+    "debug": "^4.1.1",
+    "pull-notify": "~0.1.1",
+    "secret-stack-decorators": "~1.0.0",
+    "ssb-keys": "^7.1.7",
+    "ssb-ref": "^2.13.9"
+  },
+  "peerDependencies": {
+    "secret-stack": ">=6.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^11.10.4",
+    "ssb-server": "~15.0.2",
+    "pull-stream": "^3.6.9",
+    "tape": "^4.9.2",
+    "typescript": "3.3.x"
+  },
+  "scripts": {
+    "typescript": "tsc",
+    "tape": "set -e; for t in test/*.js; do node $t; done",
+    "test": "npm run typescript && npm run tape"
+  },
+  "author": "Andre Staltz <contact@staltz.com> (http://staltz.com)",
+  "license": "MIT"
+}
