@@ -27,12 +27,7 @@ class LAN {
     const address = buf.toString();
     const peer = Ref.parseAddress(address);
     if (peer && peer.key !== this.ssb.id) {
-      const disc: Discovery = {
-        address: address,
-        verified: false,
-        capsHash: null,
-      };
-      this.notifyDiscovery(disc);
+      this.notifyDiscovery({address, verified: false} as Discovery);
     }
   };
 
@@ -45,34 +40,42 @@ class LAN {
   }
 
   private readNormal = (buf: any) => {
-    if (buf.loopback) return;
+    // split buf into [ciphertext,sig]
+    const ciphertext = buf.slice(0, buf.length - 64);
+    const sig = buf.slice(buf.length - 64, buf.length);
 
-    const msg = buf.toString();
-
-    let parsed: {[name: string]: string};
+    // decrypt address
+    let address: string;
     try {
-      parsed = JSON.parse(msg);
+      const obj = Keys.secretUnbox(ciphertext, this.config.caps.shs);
+      address = obj.address;
     } catch (err) {
-      debug('failed to interpret broadcasted message: %s', msg);
+      debug('failed to interpret broadcasted message: %s', buf.toString('hex'));
       return;
     }
-    const {address, capsHash, signature} = parsed;
 
+    // validate address
     const peer = Ref.parseAddress(address);
     if (!peer) {
-      debug('failed to parse address from broadcasted message: %s', msg);
+      debug(
+        'failed to parse address from broadcasted message: %s',
+        buf.toString('hex'),
+      );
       return;
     }
 
+    // avoid discovering ourselves
     if (peer.key === this.ssb.id) {
       return;
     }
 
-    const obj = {address, signature};
+    // verify signature of address
+    const b64sig = sig.toString('base64') + '.sig.ed25519';
+    const obj = {address, signature: b64sig};
     const verified = Keys.verifyObj({public: peer.key}, obj);
 
-    const disc: Discovery = {address, verified, capsHash};
-    this.notifyDiscovery(disc);
+    // notify
+    this.notifyDiscovery({address, verified} as Discovery);
   };
 
   private writeNormal() {
@@ -81,12 +84,18 @@ class LAN {
       this.ssb.getAddress('private') || this.ssb.getAddress('local');
 
     if (address) {
-      const caps = this.config.caps.shs;
-      const capsHash = Keys.hash(caps);
-      const obj = {address};
-      const signature = Keys.signObj(this.ssb.keys.private, obj).signature;
-      const msg = JSON.stringify({address, capsHash, signature});
-      this.normalBroadcast.write(msg);
+      // encrypt address
+      const ciphertext = Keys.secretBox({address}, this.config.caps.shs);
+
+      // sign address
+      const b64sig = Keys.signObj(this.ssb.keys, {address}).signature;
+      const sig = Buffer.from(b64sig.replace(/\.sig\.ed25519$/, ''), 'base64');
+
+      // concatenate [ciphertext,sig]
+      const payload = Buffer.concat([ciphertext, sig]);
+
+      // broadcast
+      this.normalBroadcast.write(payload);
     }
   }
 

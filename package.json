@@ -14,7 +14,7 @@
     "debug": "^4.1.1",
     "pull-notify": "~0.1.1",
     "secret-stack-decorators": "~1.0.0",
-    "ssb-keys": "^7.1.7",
+    "ssb-keys": "^7.2.0",
     "ssb-ref": "^2.13.9"
   },
   "peerDependencies": {
@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@types/node": "^11.10.4",
-    "ssb-server": "~15.0.2",
+    "ssb-server": "~15.1.0",
     "pull-stream": "^3.6.9",
     "tape": "^4.9.2",
     "typescript": "3.3.x"
