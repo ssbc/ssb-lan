@@ -12,6 +12,7 @@ class LAN {
   private readonly ssb: any;
   private readonly config: any;
   private readonly notifyDiscovery: any;
+  private readonly caps: Buffer;
   private legacyBroadcast: any;
   private normalBroadcast: any;
   private int?: any;
@@ -20,6 +21,7 @@ class LAN {
     this.ssb = ssb;
     this.config = config;
     this.notifyDiscovery = Notify();
+    this.caps = Buffer.from(config.caps.shs, 'base64');
   }
 
   private readLegacy = (buf: any) => {
@@ -47,7 +49,7 @@ class LAN {
     // decrypt address
     let address: string;
     try {
-      const obj = Keys.secretUnbox(ciphertext, this.config.caps.shs);
+      const obj = Keys.secretUnbox(ciphertext, this.caps);
       address = obj.address;
     } catch (err) {
       debug('failed to interpret broadcasted message: %s', buf.toString('hex'));
@@ -85,7 +87,7 @@ class LAN {
 
     if (address) {
       // encrypt address
-      const ciphertext = Keys.secretBox({address}, this.config.caps.shs);
+      const ciphertext = Keys.secretBox({address}, this.caps);
 
       // sign address
       const b64sig = Keys.signObj(this.ssb.keys, {address}).signature;
