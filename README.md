@@ -35,20 +35,18 @@ Now you should be able to access the following muxrpc APIs under `ssb.lan.*`:
 |-----|------|-------------|
 | **`start()`** | `sync` | Triggers the start of LAN discovery of peers. |
 | **`stop()`** | `sync` | Stops the LAN discovery of peers if it is currently active. |
-| **`discoveredPeers()`** | `source` | A pull-stream that emits "discovery objects" (see definition below) every time a peer is (re)discovered on the local area network. |
+| **`discoveredPeers()`** | `source` | A pull-stream that emits "discovery objects" (see definition below) every time a peer is (re)discovered on the local area network. Only peers using the same [network caps](https://github.com/ssbc/ssb-caps) are discovered. |
 
 A "discovery" is an object with the following shape:
 
 ```typescript
 type Discovery = {
   address: string;
-  capsHash: string | null;
   verified: boolean;
 };
 ```
 
 - **address**: this is a [multiserver address](https://github.com/dominictarr/multiserver-address) that the remote peer is declaring to us in the LAN
-- **capsHash**: this is a sha256 hash of the secret-handshake "caps" adopted and broadcasted by the remote peer. Is null when the remote peer did not announce this field, perhaps because they used the legacy ssb-local
 - **verified**: this is a boolean indicating whether we are cryptographically sure the remote peer is not spoofing their multiserver address, and that they actually own the ed25519 identity which they announced
 
 ## License
