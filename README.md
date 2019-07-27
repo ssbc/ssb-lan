@@ -1,6 +1,6 @@
 # ssb-lan
 
-SSB plugin for discovery of other peers in the same LAN. Works by broadcasting UDP packets to all other peers in the local network. **Is backwards-compatible** with [ssb-local](https://github.com/ssbc/ssb-local).
+SSB plugin for discovery of other peers in the same LAN. Works by broadcasting UDP packets to all other peers in the local network. The data in these packets is (symmetrically) encrypted using your chosen [network caps](https://github.com/ssbc/ssb-caps). **Is backwards-compatible** with [ssb-local](https://github.com/ssbc/ssb-local).
 
 ## Usage
 
