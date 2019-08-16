@@ -7,10 +7,11 @@ const Notify = require('pull-notify');
 const debug = require('debug')('ssb:lan');
 const lanDiscoveryPort = require('../port');
 
+const LEGACY_PORT = 8008;
+
 @plugin('1.0.0')
 class LAN {
   private readonly ssb: any;
-  private readonly config: any;
   private readonly notifyDiscovery: any;
   private readonly caps: Buffer;
   private legacyBroadcast: any;
@@ -19,7 +20,6 @@ class LAN {
 
   constructor(ssb: any, config: any) {
     this.ssb = ssb;
-    this.config = config;
     this.notifyDiscovery = Notify();
     this.caps = Buffer.from(config.caps.shs, 'base64');
   }
@@ -116,7 +116,7 @@ class LAN {
     }
 
     try {
-      this.legacyBroadcast = broadcast(this.config.port);
+      this.legacyBroadcast = broadcast(LEGACY_PORT);
     } catch (err) {
       debug('legacy broadcast turned off because: %s', err);
       this.legacyBroadcast = null;
@@ -128,7 +128,7 @@ class LAN {
 
     // Write now, then periodically
     this.writeBoth();
-    this.int = setInterval(this.writeBoth, 2000);
+    this.int = setInterval(this.writeBoth, 2e3);
     if (this.int.unref) this.int.unref();
   };
 
