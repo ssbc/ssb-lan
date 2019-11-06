@@ -28,7 +28,7 @@ class LAN {
     if (buf.loopback) return;
     const address = buf.toString();
     const peer = Ref.parseAddress(address);
-    if (peer && peer.key !== this.ssb.id) {
+    if (peer?.key !== this.ssb.id) {
       this.notifyDiscovery({address, verified: false} as Discovery);
     }
   };
@@ -36,7 +36,7 @@ class LAN {
   private writeLegacy() {
     if (!this.legacyBroadcast) return;
     const address =
-      this.ssb.getAddress('private') || this.ssb.getAddress('local');
+      this.ssb.getAddress('private') ?? this.ssb.getAddress('local');
 
     if (address) this.legacyBroadcast.write(address);
   }
@@ -83,7 +83,7 @@ class LAN {
   private writeNormal() {
     if (!this.normalBroadcast) return;
     const address =
-      this.ssb.getAddress('private') || this.ssb.getAddress('local');
+      this.ssb.getAddress('private') ?? this.ssb.getAddress('local');
 
     if (address) {
       // encrypt address
