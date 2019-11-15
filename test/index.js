@@ -72,7 +72,7 @@ tape('broadcast write is correct', t => {
     const {address} = Keys.secretUnbox(ciphertext, alice.config.caps.shs);
     t.true(Ref.isAddress(address), 'plaintext is a multiserver address');
 
-    const {key} = Ref.parseAddress(address);
+    const key = Ref.getKeyFromAddress(address);
     const verification = Keys.verifyObj({public: key}, {address, signature});
     t.true(verification, 'signature is verified');
 
