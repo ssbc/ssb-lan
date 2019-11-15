@@ -3,3 +3,4 @@ node_modules
 shrinkwrap.yaml
 pnpm-lock.yaml
 lib
+package-lock.json

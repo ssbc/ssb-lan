@@ -27,8 +27,8 @@ class LAN {
   private readLegacy = (buf: any) => {
     if (buf.loopback) return;
     const address = buf.toString();
-    const peer = Ref.parseAddress(address);
-    if (peer?.key !== this.ssb.id) {
+    const peerKey = Ref.getKeyFromAddress(address);
+    if (peerKey !== this.ssb.id) {
       this.notifyDiscovery({address, verified: false} as Discovery);
     }
   };
@@ -57,8 +57,8 @@ class LAN {
     }
 
     // validate address
-    const peer = Ref.parseAddress(address);
-    if (!peer) {
+    const peerKey = Ref.getKeyFromAddress(address);
+    if (!peerKey) {
       debug(
         'failed to parse address from broadcasted message: %s',
         buf.toString('hex'),
@@ -67,14 +67,14 @@ class LAN {
     }
 
     // avoid discovering ourselves
-    if (peer.key === this.ssb.id) {
+    if (peerKey === this.ssb.id) {
       return;
     }
 
     // verify signature of address
     const b64sig = sig.toString('base64') + '.sig.ed25519';
     const obj = {address, signature: b64sig};
-    const verified = Keys.verifyObj({public: peer.key}, obj);
+    const verified = Keys.verifyObj({public: peerKey}, obj);
 
     // notify
     this.notifyDiscovery({address, verified} as Discovery);
