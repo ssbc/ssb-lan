@@ -28,7 +28,7 @@ class LAN {
     if (buf.loopback) return;
     const address = buf.toString();
     const peerKey = Ref.getKeyFromAddress(address);
-    if (peerKey !== this.ssb.id) {
+    if (peerKey && peerKey !== this.ssb.id) {
       this.notifyDiscovery({address, verified: false} as Discovery);
     }
   };
