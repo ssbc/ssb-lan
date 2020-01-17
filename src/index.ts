@@ -5,8 +5,8 @@ const Ref = require('ssb-ref');
 const Keys = require('ssb-keys');
 const Notify = require('pull-notify');
 const debug = require('debug')('ssb:lan');
-const lanDiscoveryPort = require('../port');
 
+const NORMAL_PORT = require('../port');
 const LEGACY_PORT = 8008;
 
 @plugin('1.0.0')
@@ -111,15 +111,16 @@ class LAN {
   @muxrpc('sync')
   public start = () => {
     try {
-      this.normalBroadcast = broadcast(lanDiscoveryPort);
+      this.normalBroadcast = broadcast(NORMAL_PORT);
     } catch (err) {
       debug('LAN broadcast turned off because: %s', err);
       this.normalBroadcast = void 0;
     }
 
     try {
-      if (this.legacyEnabled) this.legacyBroadcast = broadcast(LEGACY_PORT);
-      else this.legacyBroadcast = void 0;
+      this.legacyBroadcast = this.legacyEnabled
+        ? broadcast(LEGACY_PORT)
+        : void 0;
     } catch (err) {
       debug('legacy broadcast turned off because: %s', err);
       this.legacyBroadcast = void 0;
