@@ -11,11 +11,11 @@ const LEGACY_PORT = 8008;
 
 @plugin('1.0.0')
 class LAN {
-  private readonly ssb: any;
-  private readonly notifyDiscovery: any;
+  private readonly ssb: Record<string, any>;
+  private readonly notifyDiscovery: CallableFunction & Record<string, any>;
   private readonly caps: Buffer;
-  private legacyBroadcast: any;
-  private normalBroadcast: any;
+  private legacyBroadcast?: Record<string, any>;
+  private normalBroadcast?: Record<string, any>;
   private int?: any;
 
   constructor(ssb: any, config: any) {
@@ -112,14 +112,14 @@ class LAN {
       this.normalBroadcast = broadcast(lanDiscoveryPort);
     } catch (err) {
       debug('LAN broadcast turned off because: %s', err);
-      this.normalBroadcast = null;
+      this.normalBroadcast = void 0;
     }
 
     try {
       this.legacyBroadcast = broadcast(LEGACY_PORT);
     } catch (err) {
       debug('legacy broadcast turned off because: %s', err);
-      this.legacyBroadcast = null;
+      this.legacyBroadcast = void 0;
     }
 
     // Read
@@ -135,10 +135,14 @@ class LAN {
   @muxrpc('sync')
   public stop = () => {
     clearInterval(this.int);
-    this.normalBroadcast.close();
-    this.normalBroadcast = null;
-    this.legacyBroadcast.close();
-    this.legacyBroadcast = null;
+    if (this.normalBroadcast) {
+      this.normalBroadcast.close();
+      this.normalBroadcast = void 0;
+    }
+    if (this.legacyBroadcast) {
+      this.legacyBroadcast.close();
+      this.legacyBroadcast = void 0;
+    }
   };
 
   @muxrpc('source')
