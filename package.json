@@ -21,11 +21,11 @@
     "secret-stack": ">=6.2.0"
   },
   "devDependencies": {
-    "@types/node": "^11.10.4",
-    "pull-stream": "^3.6.9",
-    "ssb-server": "~15.1.0",
-    "tape": "^4.9.2",
-    "typescript": "3.7.x"
+    "@types/node": "^13.1.8",
+    "pull-stream": "^3.6.14",
+    "ssb-server": "~15.2.0",
+    "tape": "^4.13.0",
+    "typescript": "3.7.5"
   },
   "scripts": {
     "typescript": "tsc",
