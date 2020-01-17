@@ -1,5 +1,5 @@
 import {plugin, muxrpc} from 'secret-stack-decorators';
-import {Discovery} from './types';
+import {Discovery, SSBConfig} from './types';
 const broadcast = require('broadcast-stream');
 const Ref = require('ssb-ref');
 const Keys = require('ssb-keys');
@@ -14,14 +14,16 @@ class LAN {
   private readonly ssb: Record<string, any>;
   private readonly notifyDiscovery: CallableFunction & Record<string, any>;
   private readonly caps: Buffer;
+  private readonly legacyEnabled: boolean;
   private legacyBroadcast?: Record<string, any>;
   private normalBroadcast?: Record<string, any>;
   private int?: any;
 
-  constructor(ssb: any, config: any) {
+  constructor(ssb: Record<string, any>, config: SSBConfig) {
     this.ssb = ssb;
     this.notifyDiscovery = Notify();
     this.caps = Buffer.from(config.caps.shs, 'base64');
+    this.legacyEnabled = config.lan?.legacy !== false;
   }
 
   private readLegacy = (buf: any) => {
@@ -116,7 +118,8 @@ class LAN {
     }
 
     try {
-      this.legacyBroadcast = broadcast(LEGACY_PORT);
+      if (this.legacyEnabled) this.legacyBroadcast = broadcast(LEGACY_PORT);
+      else this.legacyBroadcast = void 0;
     } catch (err) {
       debug('legacy broadcast turned off because: %s', err);
       this.legacyBroadcast = void 0;

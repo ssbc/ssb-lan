@@ -7,6 +7,34 @@ const Ref = require('ssb-ref');
 
 const createSsbServer = require('ssb-server').use(require('../lib/index'));
 
+tape('Legacy broadcasting can be turned off', t => {
+  t.plan(0);
+
+  const keys = Keys.generate();
+  const alice = createSsbServer({
+    temp: 'test-lan-alice',
+    timeout: 1000,
+    port: 8008,
+    keys,
+    lan: {
+      legacy: false,
+    },
+  });
+  alice.lan.start();
+
+  const b = broadcast(8008);
+  b.on('data', buf => {
+    t.fail('No UDP packet should have been received, but we did receive');
+  });
+
+  setTimeout(() => {
+    b.close();
+    alice.lan.stop();
+    alice.close();
+    t.end();
+  }, 3000);
+});
+
 tape('Legacy (when enabled) broadcasting looks correct', t => {
   t.plan(1);
 

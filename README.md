@@ -49,6 +49,26 @@ type Discovery = {
 - **address**: this is a [multiserver address](https://github.com/dominictarr/multiserver-address) that the remote peer is declaring to us in the LAN
 - **verified**: this is a boolean indicating whether we are cryptographically sure the remote peer is not spoofing their multiserver address, and that they actually own the ed25519 identity which they announced
 
+## Modes: legacy and normal
+
+By default, ssb-lan will operate two modes: *legacy* and *normal*. Legacy mode mimics how ssb-local behaves, broadcasting UDP packets with the same format for the contents of the packet, i.e. multiserver addresses as strings. Normal mode broadcasts packets with encrypted contents, using the *network caps* as symmetric encryption key.
+
+**You can turn off legacy mode** by updating your SSB config object:
+
+```diff
+ {
+   path: ssbPath,
+   keys: keys,
+   port: 8008,
+   conn: {
+     autostart: false
+   },
++  lan: {
++    legacy: false
++  }
+ }
+```
+
 ## License
 
 MIT
