@@ -5,6 +5,10 @@
   "homepage": "https://github.com/staltz/ssb-lan",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "files": [
+    "lib/*",
+    "*.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/staltz/ssb-lan.git"
