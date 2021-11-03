@@ -7,7 +7,7 @@ const Ref = require('ssb-ref');
 
 const createSsbServer = require('ssb-server').use(require('../lib/index'));
 
-tape('Legacy broadcasting can be turned off', t => {
+tape('Legacy broadcasting can be turned off', (t) => {
   t.plan(0);
 
   const keys = Keys.generate();
@@ -23,7 +23,7 @@ tape('Legacy broadcasting can be turned off', t => {
   alice.lan.start();
 
   const b = broadcast(8008);
-  b.on('data', buf => {
+  b.on('data', (buf) => {
     t.fail('No UDP packet should have been received, but we did receive');
   });
 
@@ -35,7 +35,7 @@ tape('Legacy broadcasting can be turned off', t => {
   }, 3000);
 });
 
-tape('Legacy (when enabled) broadcasting looks correct', t => {
+tape('Legacy (when enabled) broadcasting looks correct', (t) => {
   t.plan(1);
 
   const keys = Keys.generate();
@@ -48,7 +48,7 @@ tape('Legacy (when enabled) broadcasting looks correct', t => {
   alice.lan.start();
 
   const b = broadcast(8008);
-  b.on('data', buf => {
+  b.on('data', (buf) => {
     const msg = buf.toString();
 
     t.true(Ref.isAddress(msg), 'broadcasted content is a multiserver address');
@@ -62,7 +62,7 @@ tape('Legacy (when enabled) broadcasting looks correct', t => {
   });
 });
 
-tape('broadcast write is correct', t => {
+tape('broadcast write is correct', (t) => {
   t.plan(6);
 
   const keys = Keys.generate();
@@ -75,7 +75,7 @@ tape('broadcast write is correct', t => {
   alice.lan.start();
 
   const b = broadcast(port);
-  b.on('data', buf => {
+  b.on('data', (buf) => {
     try {
       JSON.parse(buf.toString());
       t.fail('JSON parsing must fail');
@@ -108,7 +108,7 @@ tape('broadcast write is correct', t => {
   });
 });
 
-tape('broadcast read is correct', t => {
+tape('broadcast read is correct', (t) => {
   t.plan(4);
 
   const aliceKeys = Keys.generate();
@@ -122,7 +122,7 @@ tape('broadcast read is correct', t => {
 
   pull(
     alice.lan.discoveredPeers(),
-    pull.drain(discovery => {
+    pull.drain((discovery) => {
       t.equals(typeof discovery.address, 'string', 'address is a string');
       t.ok(discovery.address, 'address is okay');
       t.equals(
@@ -134,11 +134,9 @@ tape('broadcast read is correct', t => {
       t.true(discovery.verified, 'discovery is verified');
 
       b.close();
-      alice.lan.stop();
-      alice.close();
 
       setTimeout(() => {
-        t.end();
+        alice.close(t.end);
       }, 1000);
     }),
   );

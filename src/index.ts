@@ -3,6 +3,7 @@ import {Discovery, SSBConfig} from './types';
 const broadcast = require('broadcast-stream');
 const Ref = require('ssb-ref');
 const Keys = require('ssb-keys');
+const pull = require('pull-stream');
 const Notify = require('pull-notify');
 const debug = require('debug')('ssb:lan');
 
@@ -12,16 +13,16 @@ const LEGACY_PORT = 8008;
 @plugin('1.0.0')
 class LAN {
   private readonly ssb: Record<string, any>;
-  private readonly notifyDiscovery: CallableFunction & Record<string, any>;
   private readonly caps: Buffer;
   private readonly legacyEnabled: boolean;
+  private notifyDiscovery?: CallableFunction & Record<string, any>;
   private legacyBroadcast?: Record<string, any>;
   private normalBroadcast?: Record<string, any>;
   private int?: any;
 
   constructor(ssb: Record<string, any>, config: SSBConfig) {
     this.ssb = ssb;
-    this.notifyDiscovery = Notify();
+    this.notifyDiscovery = void 0;
     this.caps = Buffer.from(config.caps.shs, 'base64');
     this.legacyEnabled = config.lan?.legacy !== false;
   }
@@ -31,7 +32,7 @@ class LAN {
     const address = buf.toString();
     const peerKey = Ref.getKeyFromAddress(address);
     if (peerKey && peerKey !== this.ssb.id) {
-      this.notifyDiscovery({address, verified: false} as Discovery);
+      this.notifyDiscovery!({address, verified: false} as Discovery);
     }
   };
 
@@ -79,7 +80,7 @@ class LAN {
     const verified = Keys.verifyObj({public: peerKey}, obj);
 
     // notify
-    this.notifyDiscovery({address, verified} as Discovery);
+    this.notifyDiscovery!({address, verified} as Discovery);
   };
 
   private writeNormal() {
@@ -110,6 +111,8 @@ class LAN {
 
   @muxrpc('sync')
   public start = () => {
+    this.notifyDiscovery = Notify();
+
     try {
       this.normalBroadcast = broadcast(NORMAL_PORT);
     } catch (err) {
@@ -133,25 +136,31 @@ class LAN {
     // Write now, then periodically
     this.writeBoth();
     this.int = setInterval(this.writeBoth, 2e3);
-    if (this.int.unref) this.int.unref();
+    this.int?.unref?.();
+
+    // Setup to call `stop` automatically when ssb is closed
+    const that = this;
+    this.ssb.close.hook(function (this: any, fn: any, args: any) {
+      that.stop();
+      fn.apply(this, args);
+    });
   };
 
   @muxrpc('sync')
   public stop = () => {
     clearInterval(this.int);
-    if (this.normalBroadcast) {
-      this.normalBroadcast.close();
-      this.normalBroadcast = void 0;
-    }
-    if (this.legacyBroadcast) {
-      this.legacyBroadcast.close();
-      this.legacyBroadcast = void 0;
-    }
+    this.notifyDiscovery?.end();
+    this.notifyDiscovery = void 0;
+    this.normalBroadcast?.close();
+    this.normalBroadcast = void 0;
+    this.legacyBroadcast?.close();
+    this.legacyBroadcast = void 0;
   };
 
   @muxrpc('source')
   public discoveredPeers = () => {
-    return this.notifyDiscovery.listen();
+    if (this.notifyDiscovery) return this.notifyDiscovery.listen();
+    else return pull.empty();
   };
 }
 
