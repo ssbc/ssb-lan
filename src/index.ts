@@ -10,7 +10,7 @@ const debug = require('debug')('ssb:lan');
 const NORMAL_PORT = require('../port');
 const LEGACY_PORT = 8008;
 
-@plugin('1.0.0')
+@plugin('1.1.0')
 class LAN {
   private readonly ssb: Record<string, any>;
   private readonly caps: Buffer;
