@@ -29,7 +29,7 @@
     "pull-stream": "^3.6.14",
     "ssb-server": "~15.2.0",
     "tape": "^5.2.0",
-    "typescript": "4.2.2"
+    "typescript": "4.4.4"
   },
   "scripts": {
     "typescript": "tsc",
