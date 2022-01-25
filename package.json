@@ -1,7 +1,7 @@
 {
   "name": "ssb-lan",
   "description": "SSB plugin for discovery of other peers in the same LAN",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "homepage": "https://github.com/staltz/ssb-lan",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
