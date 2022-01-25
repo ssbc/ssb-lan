@@ -1,7 +1,7 @@
 const pull = require('pull-stream');
 const tape = require('tape');
 const Keys = require('ssb-keys');
-const broadcast = require('broadcast-stream');
+const broadcast = require('dgram-broadcast');
 const port = require('../port');
 const Ref = require('ssb-ref');
 

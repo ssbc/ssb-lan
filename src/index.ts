@@ -1,6 +1,6 @@
 import {plugin, muxrpc} from 'secret-stack-decorators';
 import {Discovery, SSBConfig} from './types';
-const broadcast = require('broadcast-stream');
+const broadcast = require('dgram-broadcast');
 const Ref = require('ssb-ref');
 const Keys = require('ssb-keys');
 const Notify = require('pull-notify');

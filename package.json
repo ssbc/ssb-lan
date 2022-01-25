@@ -14,7 +14,7 @@
     "url": "git://github.com/staltz/ssb-lan.git"
   },
   "dependencies": {
-    "broadcast-stream": "^0.2.2",
+    "dgram-broadcast": "^1.0.0",
     "debug": "^4.3.1",
     "pull-notify": "~0.1.1",
     "secret-stack-decorators": "~1.1.0",
