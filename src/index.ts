@@ -4,6 +4,8 @@ const broadcast = require('dgram-broadcast');
 const Ref = require('ssb-ref');
 const Keys = require('ssb-keys');
 const Notify = require('pull-notify');
+const IP = require('ip');
+const nonPrivateIP = require('non-private-ip');
 const debug = require('debug')('ssb:lan');
 
 const NORMAL_PORT = require('../port');
@@ -108,10 +110,18 @@ class LAN {
     this.writeNormal();
   };
 
+  private getBroadcastIP(): string | undefined {
+    const details = nonPrivateIP(null, IP.isPrivate, true);
+    if (!details) return undefined;
+    return IP.subnet(details.address, details.netmask).broadcastAddress;
+  }
+
   @muxrpc('sync')
   public start = () => {
+    const broadcastIP = this.getBroadcastIP();
+    const destinations = [broadcastIP, '255.255.255.255'].filter((x) => !!x);
     try {
-      this.normalBroadcast = broadcast(NORMAL_PORT);
+      this.normalBroadcast = broadcast(NORMAL_PORT, true, destinations);
     } catch (err) {
       debug('LAN broadcast turned off because: %s', err);
       this.normalBroadcast = void 0;
@@ -119,7 +129,7 @@ class LAN {
 
     try {
       this.legacyBroadcast = this.legacyEnabled
-        ? broadcast(LEGACY_PORT)
+        ? broadcast(LEGACY_PORT, true, destinations)
         : void 0;
     } catch (err) {
       debug('legacy broadcast turned off because: %s', err);

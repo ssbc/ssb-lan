@@ -16,6 +16,8 @@
   "dependencies": {
     "debug": "^4.3.1",
     "dgram-broadcast": "^1.0.0",
+    "non-private-ip": "^2.1.0",
+    "ip": "^1.1.5",
     "pull-notify": "~0.1.2",
     "secret-stack-decorators": "~1.1.0",
     "ssb-keys": "^8.0.2",
