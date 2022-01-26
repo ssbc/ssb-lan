@@ -110,16 +110,16 @@ class LAN {
     this.writeNormal();
   };
 
-  private getBroadcastIP(): string | undefined {
+  private getBroadcastIPs(): Array<string> {
     const details = nonPrivateIP(null, IP.isPrivate, true);
-    if (!details) return undefined;
-    return IP.subnet(details.address, details.netmask).broadcastAddress;
+    if (!details) return ['255.255.255.255'];
+    const {broadcastAddress} = IP.subnet(details.address, details.netmask);
+    return [broadcastAddress];
   }
 
   @muxrpc('sync')
   public start = () => {
-    const broadcastIP = this.getBroadcastIP();
-    const destinations = [broadcastIP, '255.255.255.255'].filter((x) => !!x);
+    const destinations = this.getBroadcastIPs();
     try {
       this.normalBroadcast = broadcast(NORMAL_PORT, true, destinations);
     } catch (err) {
