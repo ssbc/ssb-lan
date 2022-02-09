@@ -111,6 +111,7 @@ class LAN {
   };
 
   private getBroadcastIPs(): Array<string> {
+    if ((process.platform as any) === 'ios') return ['255.255.255.255'];
     const details = nonPrivateIP(null, IP.isPrivate, true);
     if (!details) return ['255.255.255.255'];
     const {broadcastAddress} = IP.subnet(details.address, details.netmask);
