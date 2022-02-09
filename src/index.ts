@@ -118,11 +118,18 @@ class LAN {
     return [broadcastAddress];
   }
 
+  private handleBroadcastError = (err: any) => {
+    debug('dgram-broadcast error: %o', err);
+    this.stop();
+    this.start();
+  };
+
   @muxrpc('sync')
   public start = () => {
     const destinations = this.getBroadcastIPs();
     try {
       this.normalBroadcast = broadcast(NORMAL_PORT, true, destinations);
+      this.normalBroadcast?.on('error', this.handleBroadcastError);
     } catch (err) {
       debug('LAN broadcast turned off because: %s', err);
       this.normalBroadcast = void 0;
@@ -135,11 +142,12 @@ class LAN {
     } catch (err) {
       debug('legacy broadcast turned off because: %s', err);
       this.legacyBroadcast = void 0;
+      this.normalBroadcast?.on('error', this.handleBroadcastError);
     }
 
     // Read
-    if (this.normalBroadcast) this.normalBroadcast.on('data', this.readNormal);
-    if (this.legacyBroadcast) this.legacyBroadcast.on('data', this.readLegacy);
+    this.normalBroadcast?.on('data', this.readNormal);
+    this.legacyBroadcast?.on('data', this.readLegacy);
 
     // Write now, then periodically
     this.writeBoth();
